@@ -27,25 +27,29 @@ var banner = ['/**',
  * Clean ups ./dist folder
  */
 gulp.task('clean', function() {
-  return gulp
-    .src('./dist', {read: false})
-    .pipe(clean({force: true}))
-    .on('error', log);
+    return gulp
+        .src('./dist', {
+            read: false
+        })
+        .pipe(clean({
+            force: true
+        }))
+        .on('error', log);
 });
 
 /**
  * Processes Handlebars templates
  */
 function templates() {
-  return gulp
-    .src(['./src/main/template/**/*'])
-    .pipe(handlebars())
-    .pipe(wrap('Handlebars.template(<%= contents %>)'))
-    .pipe(declare({
-      namespace: 'Handlebars.templates',
-      noRedeclare: true, // Avoid duplicate declarations
-    }))
-    .on('error', log);
+    return gulp
+        .src(['./src/main/template/**/*'])
+        .pipe(handlebars())
+        .pipe(wrap('Handlebars.template(<%= contents %>)'))
+        .pipe(declare({
+            namespace: 'Handlebars.templates',
+            noRedeclare: true, // Avoid duplicate declarations
+        }))
+        .on('error', log);
 }
 
 /**
@@ -53,24 +57,28 @@ function templates() {
  */
 gulp.task('dist', ['clean'], function() {
 
-  return es.merge(
-      gulp.src([
+    return es.merge(
+            gulp.src([
         './src/main/javascript/**/*.js',
         './node_modules/swagger-client/browser/swagger-client.js'
       ]),
-      templates()
-    )
-    .pipe(order(['scripts.js', 'templates.js']))
-    .pipe(concat('swagger-ui.js'))
-    .pipe(wrap('(function(){<%= contents %>}).call(this);'))
-    .pipe(header(banner, { pkg: pkg } ))
-    .pipe(gulp.dest('./dist'))
-    .pipe(uglify())
-    .on('error', log)
-    .pipe(rename({extname: '.min.js'}))
-    .on('error', log)
-    .pipe(gulp.dest('./dist'))
-    .pipe(connect.reload());
+            templates()
+        )
+        .pipe(order(['scripts.js', 'templates.js']))
+        .pipe(concat('swagger-ui.js'))
+        .pipe(wrap('(function(){<%= contents %>}).call(this);'))
+        .pipe(header(banner, {
+            pkg: pkg
+        }))
+        .pipe(gulp.dest('./dist'))
+        .pipe(uglify())
+        .on('error', log)
+        .pipe(rename({
+            extname: '.min.js'
+        }))
+        .on('error', log)
+        .pipe(gulp.dest('./dist'))
+        .pipe(connect.reload());
 });
 
 /**
@@ -78,16 +86,16 @@ gulp.task('dist', ['clean'], function() {
  */
 gulp.task('less', ['clean'], function() {
 
-  return gulp
-    .src([
+    return gulp
+        .src([
       './src/main/less/screen.less',
       './src/main/less/print.less',
       './src/main/less/reset.less'
     ])
-    .pipe(less())
-    .on('error', log)
-    .pipe(gulp.dest('./src/main/html/css/'))
-    .pipe(connect.reload());
+        .pipe(less())
+        .on('error', log)
+        .pipe(gulp.dest('./src/main/html/css/'))
+        .pipe(connect.reload());
 });
 
 
@@ -96,40 +104,52 @@ gulp.task('less', ['clean'], function() {
  */
 gulp.task('copy', ['less'], function() {
 
-  // copy JavaScript files inside lib folder
-  gulp
-    .src(['./lib/**/*.{js,map}'])
-    .pipe(gulp.dest('./dist/lib'))
-    .on('error', log);
+    // copy JavaScript files inside lib folder
+    gulp
+        .src(['./lib/**/*.{js,map}'])
+        .pipe(gulp.dest('./dist/lib'))
+        .on('error', log);
 
-  // copy all files inside html folder
-  gulp
-    .src(['./src/main/html/**/*'])
-    .pipe(gulp.dest('./dist'))
-    .on('error', log);
+    // copy all files inside html folder
+    gulp
+        .src(['./src/main/html/**/*'])
+        .pipe(gulp.dest('./dist'))
+        .on('error', log);
 });
 
 /**
  * Watch for changes and recompile
  */
 gulp.task('watch', function() {
-  return watch(['./src/**/*.{js,less,handlebars}'], function() {
-    gulp.start('default');
-  });
+    return watch(['./src/**/*.{js,less,handlebars}'], function() {
+        gulp.start('default');
+    });
 });
 
 /**
  * Live reload web server of `dist`
  */
 gulp.task('connect', function() {
-  connect.server({
-    root: 'dist',
-    livereload: true
-  });
+    connect.server({
+        root: 'dist',
+        livereload: true
+    });
+});
+
+/**
+ * Live reload web server of `dist`
+ */
+gulp.task('start', function() {
+    connect.server({
+        name: 'Dist App',
+        root: 'dist',
+        host: '0.0.0.0',
+        port: process.env.PORT
+    });
 });
 
 function log(error) {
-  console.error(error.toString && error.toString());
+    console.error(error.toString && error.toString());
 }
 
 
