@@ -59,3 +59,16 @@ typings/
 
 # next.js build output
 .next
+.DS_STORE
+*.ipr
+*.iml
+*.iws
+web/
+lib/*.zip
+version.properties
+.sass-cache
+swagger-ui.sublime-workspace
+.idea
+.project
+node_modules/*
+/nbproject/private/
