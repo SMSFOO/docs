@@ -144,7 +144,8 @@ gulp.task('start', function() {
         name: 'Dist App',
         root: 'dist',
         host: '0.0.0.0',
-        port: process.env.PORT
+        port: process.env.PORT,
+        https: true
     });
 });
 
