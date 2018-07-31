@@ -136,19 +136,6 @@ gulp.task('connect', function() {
     });
 });
 
-/**
- * Live reload web server of `dist`
- */
-gulp.task('start', function() {
-    connect.server({
-        name: 'Dist App',
-        root: 'dist',
-        host: 'foo-docs.herokuapp.com',
-        port: process.env.PORT,
-        https: true
-    });
-});
-
 function log(error) {
     console.error(error.toString && error.toString());
 }
