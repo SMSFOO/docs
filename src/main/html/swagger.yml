@@ -6,41 +6,38 @@ swagger: '2.0'
 ################################################################################
 info:
   version: v1
-  title: Instagram API
+  title: SMSFoo API
   description: |
-    The first version of the Instagram API is an exciting step forward towards
-    making it easier for users to have open access to their data. We created it
-    so that you can surface the amazing content Instagram users share every
-    second, in fun and innovative ways.
+    This document provides developers with instructions for integrating SMS
+    messaging services into various solutions using  SMSFoo HTTP application
+    programming interface (HTTP API). SMSFoo HTTP API can be used for sending
+    SMS messages, collecting delivery reports, making Network Query (NQ) requests
+    and receiving inbound SMS messages sent from mobile phones.
+
+    Along with SMSFoo HTTP API specifications, this documentation also provides
+    SMSFoo SMPP specifications, including connection to SMSFoo SMPP server, bind
+    options and specifications for sending HLR requests over SMPP.
 
     Build something great!
 
     Once you've
-    [registered your client](http://instagram.com/developer/register/) it's easy
-    to start requesting data from Instagram.
+    [registered as a client](http://smsfoo.com/) it's easy
+    to start communicating via the SMSFoo API.
 
     All endpoints are only accessible via https and are located at
-    `api.instagram.com`. For instance: you can grab the most popular photos at
-    the moment by accessing the following URL with your client ID
-    (replace CLIENT-ID with your own):
-    ```
-      https://api.instagram.com/v1/media/popular?client_id=CLIENT-ID
-    ```
-    You're best off using an access_token for the authenticated user for each
-    endpoint, though many endpoints don't require it.
-    In some cases an access_token will give you more access to information, and
-    in all cases, it means that you are operating under a per-access_token limit
-    vs. the same limit for your single client_id.
+    `api.smsfoo.com`. The following API methods are available:
 
+    * Send messages using HTTP XML POST
+    * Send messages using HTTP GET
+    * Collect delivery reports – collect XML-formatted delivery reports for sent
+    SMS messages
+    * Network Query (NQ) - enables the identification of the network that a mobile
+     phone number belongs to, and the status of a mobile number; includes asynchronous
+      and synchronous HLR requests over HTTP
+    * Receive messages using HTTP GET – collect SMS messages sent by your customers’
+     GSM phones
 
-    ## Limits
-    Be nice. If you're sending too many requests too quickly, we'll send back a
-    `503` error code (server unavailable).
-    You are limited to 5000 requests per hour per `access_token` or `client_id`
-    overall. Practically, this means you should (when possible) authenticate
-    users so that limits are well outside the reach of a given user.
-
-    ## Deleting Objects
+    ## Structure
     We do our best to have all our URLs be
     [RESTful](http://en.wikipedia.org/wiki/Representational_state_transfer).
     Every endpoint (URL) may support one of four different http verbs. GET
@@ -53,25 +50,137 @@ info:
     _method=DELETE as a parameter and we will treat it as if you used PUT or
     DELETE respectively.
 
+    ## Limits
+    Be nice. If you're sending too many requests too quickly, we'll send back a
+    `503` error code (server unavailable).
+    You are limited to 500000 requests per hour per `access_token` or `client_id`
+    overall. We can always increase these limits on demand.
+
+    # HTTP Application Programming Interface
+    The Infotek system offers various methods to send and receive SMS messages.
+    This chapter contains specifications for the following methods:
+
+    * Send messages using HTTP XML POST – with this method it is possible to send
+     SMS messages to a number of recipients using XML-formatted data sent to a
+      corresponding URL.
+    * Send messages using HTTP GET – similar to the previous method, this method
+     allows sending SMS messages passing parameters directly as query string variables.
+    * Collect delivery reports – gives you the ability to collect XML-formatted
+     delivery reports from sent SMS messages using either the push (HTTP POST to a
+      predefined call-back URL) or the pull method (by making HTTP GET request to a
+       corresponding URL).
+    * Network Query – the Infotek system also offers the Network Query solution.
+    This service deals with Mobile Number Portability (MNP), enabling the identification
+     of the network that a mobile phone number belongs to, and the status of a mobile
+      number. It includes asynchronous and synchronous HLR requests over HTTP.
+    * Receive messages using HTTP GET – by using this service, you can collect SMS
+    messages sent from your customers’ GSM phones. For example, Infotek can host your
+     GSM SIM card on its GSM modem farm. Inbound messages are then forwarded to a
+      call-back URL (using HTTP GET method), which must be prepared on
+       your web server.
+
+    ## Submitting messages
+    #### HTTP(S) XML POST
+    The URL used to post XML formatted data is:
+    Data centre : `https://api.smsfoo.com/sendsms/xml`
+    ###
+
     ## Structure
 
-    ### The Envelope
-    Every response is contained by an envelope. That is, each response has a
-    predictable set of keys with which you can expect to interact:
-    ```json
-    {
-        "meta": {
-            "code": 200
-        },
-        "data": {
-            ...
-        },
-        "pagination": {
-            "next_url": "...",
-            "next_max_id": "13872296"
-        }
-    }
+    ### XML
+    The XML formatted string must have „XML=“ at the beginning.
+    There are two ways of formatting the XML string:
+
+    _Without registered delivery_
+    ```xml
+    <SMS>
+        <authentification>
+            <username></username>
+            <password></password>
+        </authentification>
+        <message>
+            <sender></sender>
+            <text></text>
+            <flash></flash>
+            <type></type>
+            <wapurl></wapurl>
+            <binary></binary>
+            <datacoding></datacoding>
+            <esmclass></esmclass>
+            <srcton></srcton>
+            <srcnpi></srcnpi>
+            <destton></destton>
+            <destnpi></destnpi>
+    <sendDateTime></sendDateTime>
+    <ValidityPeriod></ValidityPeriod>
+    <appid></appid>
+    <pushurl></pushurl>
+    <nopush></nopush>
+        </message>
+        <recipients>
+            <gsm></gsm>
+            <gsm></gsm>
+            <gsm></gsm>
+            <gsm></gsm>
+        </recipients>
+    </SMS>
     ```
+
+    _With registered delivery_
+    ```xml
+    <SMS>
+        <authentification>
+            <username></username>
+            <password></password>
+        </authentification>
+        <message>
+            <sender></sender>
+            <text></text>
+            <flash></flash>1
+            <type></type>
+            <wapurl></wapurl>
+            <binary></binary>
+            <datacoding></datacoding>
+            <esmclass></esmclass>
+            <srcton></srcton>
+            <srcnpi></srcnpi>
+            <destton></destton>
+            <destnpi></destnpi>
+    <sendDateTime></sendDateTime>
+    <ValidityPeriod></ValidityPeriod>
+    <appid></appid>
+    <pushurl></pushurl>
+    <nopush></nopush>
+        </message>
+        <recipients>
+            <gsm messageId=“clientmsgID1“></gsm>
+            <gsm messageId=“clientmsgID2“></gsm>
+            <gsm messageId=“clientmsgID3“></gsm>
+            <gsm messageId=“clientmsgID4“></gsm>
+        </recipients>
+    </SMS>
+    ```
+
+    As shown in the XML formats described above, XML formatted with registered delivery
+     contains a different <gsm> tag which includes the messageId attribute. That is the
+      main difference between these two formats and it means that when using XML formatted
+       without registered delivery, it is possible to collect delivery reports from sent
+        SMS messages, but those reports will have messageId generated by the Infotek system.
+         Therefore connecting the delivery report with its SMS message will not be possible.
+
+    On the other hand, when using XML formatted with registered delivery, each delivery report
+     will contain the messageId attribute with a value equal to the value of the messageId
+      attribute defined by the client in <gsm> tags of every recipient in XML formatted with
+       registered delivery. This is useful if the client wants to collect delivery reports for
+        specific SMS messages – and it can be done by using messageId of those messages (for more
+         details about collecting delivery reports see chapter 0).
+
+    UNICODE messages can be sent either by converting message text into hexadecimal representation
+     and inserting that content into `<binary>` tag or by inserting unconverted UNICODE text into
+      `<text>` tag. In case when you’re inserting unconverted UNICODE text you have to relay
+       `“Conent-Encoding:UTF-8”` information in the header when submitting messages using HTTP POST.
+        No matter which method you use to submit UNICODE messages you always have to set
+         `<DataCoding>8</DataCoding>`
 
     #### META
     The meta key is used to communicate extra information about the response to
